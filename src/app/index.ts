@@ -7,6 +7,7 @@
 */
 
 import * as express from 'express';
+import * as http  from "http";
 import * as bodyParser from 'body-parser';
 import * as expressGraphQL from 'express-graphql';
 import * as cors from 'cors';
@@ -23,28 +24,30 @@ import { DataBase }  from "./databases/mongoose";
 export class Server{
 
   private app:express.Application;
+  private server:http.Server;
   private root:string;
   private port:number|string|boolean;
 
   constructor(){
     this.app = express();
+    this.server = http.createServer(this.app);
     this.config()
     this.middleware()
     this.dbConnect()
   }
 
-
   private config():void{
     // define prot & normalize value
     this.port = this.normalizePort(CONFIG.server.PORT);
-    this.app.set( 'port', this.port );
+    this.app
+    .set( 'port', this.port )
+    .disable('x-powered-by')
     // TODO: add jwt auth token
     // secret variable for jwt
     //.set('superSecret', SECRET_TOKEN_KEY)
   }
   private middleware(){
     this.app
-    .disable('x-powered-by')
     // use bodyParser middleware to decode json parameters
     .use( bodyParser.json({ limit: '50mb' }) )
     // use bodyParser middleware to decode urlencoded parameters
@@ -60,7 +63,6 @@ export class Server{
     DataBase.connect()
     .then(() =>{
       // Load all route
-      //console.log(result)
       // Server Endpoints
       //this.app.use( new ServerRoutes().routes());
       this.app.get( '/', (req, res) => {
@@ -88,7 +90,7 @@ export class Server{
       this.app.get( '/', (req, res) => {
         res.json({
           code: 200,
-          message: 'Hello World - GraphQL API not available'
+          message: `Hello World - GraphQL API not available: ${error.toString()}`
         });
       });
       return error
@@ -128,9 +130,9 @@ export class Server{
   }
 
   bootstrap():void{
-    //this.app.on('error', this.onError);
-    this.app.listen(this.port, ()=>{
-      console.log("Listnening on port " + this.port)
+    this.server.on('error', this.onError);
+    this.server.listen(this.port, ()=>{
+    	console.log("Listnening on port " + this.port)
     });
   }
 

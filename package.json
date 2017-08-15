@@ -4,11 +4,15 @@
   "description": "NodeJS Simple GraphQL server with Typescript",
   "main": "server.js",
   "scripts": {
-    "dev": "npm run mongod & npm run server.dev & npm run copy.files",
-    "prod": "node ./dist/server.js ",
+    "start": "node server.js",
+    "dev": "npm run mongod & npm run server.dev",
+    "prod": "npm run server.build && node ./dist/server.js",
     "mongod": "$HOME/Applications/mongodb/bin/mongod --dbpath $HOME/Applications/mongodb/data/db",
-    "server.dev": "concurrently \"tsc server.ts -w --outDir ./dist\" \"nodemon ./dist/server.js --dev  --ignore src/ --ignore www/ --ignore .tmp/\"",
-    "copy.files": "cp ./package.json ./dist/package.json && cp ./.gitignore ./dist/.gitignore"
+    "server.dev": "tsc server.ts -w --outDir ./dist  & nodemon ./dist/server.js  --ignore **/*.ts --ignore .tmp/",
+    "server.build": "tsc server.ts --outDir ./dist && npm run copy.files",
+    "server.deploy": "npm run server.build && npm run node ../tools/tasks/deploy.server.js",
+    "copy.files": "cp ./package.json ./dist/package.json && cp ./.gitignore ./dist/.gitignore",
+    "clean.prod": "rm -rf ./dist"
   },
   "author": "Nicolas Fazio",
   "license": "ISC",
@@ -33,5 +37,8 @@
     "express-graphql": "^0.6.7",
     "graphql": "^0.10.5",
     "mongoose": "^4.11.7"
+  },
+  "engines": {
+    "node": "~7.0.0"
   }
 }
