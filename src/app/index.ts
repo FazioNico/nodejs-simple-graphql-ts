@@ -3,7 +3,7 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 15-08-2017
+ * @Last modified time: 16-08-2017
 */
 
 import * as express from 'express';
@@ -12,6 +12,11 @@ import * as bodyParser from 'body-parser';
 import * as expressGraphQL from 'express-graphql';
 import * as cors from 'cors';
 import * as morgan from 'morgan';
+
+// imports form server subscribtions
+import { execute, subscribe } from 'graphql';
+import { PubSub, SubscriptionManager } from 'graphql-subscriptions';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 
 // import config file
 import{ CONFIG } from "./config";
@@ -27,27 +32,28 @@ export class Server{
   private server:http.Server;
   private root:string;
   private port:number|string|boolean;
+  private pubsub:PubSub;
 
   constructor(){
     this.app = express();
     this.server = http.createServer(this.app);
+    this.pubsub = new PubSub();
     this.config()
     this.middleware()
     this.dbConnect()
   }
 
   private config():void{
-    // define prot & normalize value
+    // define port & normalize value
     this.port = this.normalizePort(CONFIG.server.PORT);
     this.app
     .set( 'port', this.port )
     .disable('x-powered-by')
-    // TODO: add jwt auth token
-    // secret variable for jwt
-    //.set('superSecret', SECRET_TOKEN_KEY)
   }
   private middleware(){
     this.app
+    // secret variable for jwt
+    .set('superSecret', CONFIG.secretTokent)
     // use bodyParser middleware to decode json parameters
     .use( bodyParser.json({ limit: '50mb' }) )
     // use bodyParser middleware to decode urlencoded parameters
@@ -132,7 +138,17 @@ export class Server{
   bootstrap():void{
     this.server.on('error', this.onError);
     this.server.listen(this.port, ()=>{
-    	console.log("Listnening on port " + this.port)
+      console.log("Listnening on port " + this.port)
+      // TODO: Real Time SubscriptionServer
+      // new SubscriptionServer(
+      //   {
+      //     execute,
+      //     subscribe,
+      //     schema: GraphQLSchema.schemas,
+      //   }, {
+      //     server: this.server,
+      //     path: '/subscriptions',
+      // });
     });
   }
 

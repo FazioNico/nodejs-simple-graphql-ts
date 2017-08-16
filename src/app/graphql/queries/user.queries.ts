@@ -3,7 +3,7 @@
  * @Date:   15-08-2017
  * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 15-08-2017
+ * @Last modified time: 16-08-2017
  */
 
 import {
@@ -13,47 +13,54 @@ import {
 } from 'graphql';
 
  // import the user type we created
- import { TodoType } from '../types/todo.type'
+ import { UserType } from '../types/user.type'
  // import the user resolver we created
- import { TodoResolver } from "../resolvers/todo.resolver"
+ import { UserResolver } from "../resolvers/user.resolver"
 
 
-export const TodoQuery = {
+export const UserQuery = {
  	/*
  	exemple:
- 	{
- 		todos {
+  {
+ 		users {
  			id
- 			description
- 			deadline
- 			expire
+      email
+      created
+  		admin
  		}
  	}
  	*/
  	index() {
  		return {
- 			type: new GraphQLList(TodoType),
+ 			type: new GraphQLList(UserType),
  			description: 'This will return all the todos present in the database',
  			resolve(parent, args, context, info) {
-        return TodoResolver.index()
+        return UserResolver.index()
  				//return TodoResolver.index({});
  			}
  		}
  	},
  	/*
- 	exemple:
+ 	GraphQL exemple:
  	{
- 		todo(id: "58f7642bb6520d0ba8c2f4af") {
- 			id
- 			description
- 			deadline
- 			expire
+ 		user(id: "$USER_ID") {
+    id
+    email
+    created
+    admin
  		}
  	}
+  Postman exemple:
+  {
+    "query": "query ($id: ID!) { user(id: $id) {id, email, created, admin} }",
+    "variables": {
+      "id": "5992b50893b4a617f1005f6f"
+    }
+  }
  	 */
  	single() {
  		return {
- 			type: TodoType,
+ 			type: UserType,
  			description: 'This will return data of a single todo based on the id provided',
  			args: {
  				id: {
@@ -62,7 +69,11 @@ export const TodoQuery = {
  				}
  			},
  			resolve(parent, args, context, info) {
- 				return TodoResolver.single({ id: args.id });
+        // TODO: check in console to get user token ....
+        // console.log('-------------', info)
+        const userToken = context.headers['x-access-token']
+        // console.log('-------------', userToken)
+ 				return UserResolver.single(context, { id: args.id });
  			}
  		}
  	},

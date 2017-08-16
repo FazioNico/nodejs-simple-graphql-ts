@@ -3,23 +3,17 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 15-08-2017
+ * @Last modified time: 16-08-2017
 */
 
 import * as mongoose from 'mongoose'
-;
 import { Todo, ITodoModel } from "../../models/todo.models";
 
-class TodoController {
-
-  public model:mongoose.Model<ITodoModel>
-  constructor() {
-    this.model = Todo;
-  }
+export const TodoResolver = {
 
   // this will find all the records in database and return it
-  index() {
-    return this.model.find()
+  index():Promise<ITodoModel[]>{
+    return Todo.find()
     .sort('deadline')
     .exec()
     .then( records => {
@@ -28,11 +22,13 @@ class TodoController {
     .catch( error => {
       return error;
     });
-  }
+
+    //return a;
+  },
 
   // this will find a single item based on id and return it.
-  single( options ) {
-    return this.model.findOne({ _id: options.id })
+  single( options ):Promise<ITodoModel> {
+    return Todo.findOne({ _id: options.id })
     .exec()
     .then( item => {
       return item;
@@ -40,11 +36,11 @@ class TodoController {
     .catch( error => {
       return error;
     });
-  }
+  },
 
   // this will insert a new item in database
-  create(data) {
-    const newitem = new this.model(data);
+  create(data):Promise<ITodoModel> {
+    const newitem = new Todo(data);
     console.log('###########')
     console.log('new todo-> ', data)
     return newitem.save()
@@ -54,11 +50,11 @@ class TodoController {
     .catch( (error) => {
       return error;
     });
-  }
+  },
 
   // this will update existing record in database
-  update(data) {
-    return this.model.findOne({ _id: data.id })
+  update(data):Promise<ITodoModel> {
+    return Todo.findOne({ _id: data.id })
     .exec()
     .then( (item) => {
       Object.keys(data).map( field => {
@@ -77,15 +73,15 @@ class TodoController {
     .catch( (error) => {
       return error;
     });
-  }
+  },
 
   // this will remove the record from database.
-  delete( options ) {
-    this.model.findById( options.id )
+  delete( options ):Promise<{status:boolean}> {
+    return Todo.findById( options.id )
     .exec()
     .then( item => {
       item.remove();
-      return { status: true };
+      return { status: true, id:options.id };
     })
     .catch( error => {
       return error;
@@ -93,6 +89,3 @@ class TodoController {
   }
 
 };
-
-export const TodoResolver = new TodoController();
-//module.exports = todo_controller;

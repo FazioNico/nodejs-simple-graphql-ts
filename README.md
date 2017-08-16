@@ -2,7 +2,7 @@
 <blockquote>NodeJS Simple GraphQL server with Typescript</blockquote>
 
 ## Overview
-***This personal project is currently under development***
+***This project is currently under development***
 
 Testing build Typescript GraphQL server using data from MongoDB with Mongoose.
 
@@ -18,14 +18,15 @@ Testing build Typescript GraphQL server using data from MongoDB with Mongoose.
 ## Have todo
 - [x] create build.prod
 - [ ] create deploy script tasks
-- [ ] add todo.mutation
-- [ ] create user.model; user.queries; user.mutation; user.resolver; user.type
-- [ ] add jwt user authentication
-- [ ] add user into GraphQL Routes
-- [ ] add GraphQL Subscribtion
+- [x] add todo.mutation
+- [x] create user.model; user.queries; user.mutation; user.resolver; user.type
+- [x] add jwt user authentication
+- [ ] generate/send token to user client
+- [x] add user into GraphQL Routes
+- [ ] add Real-Time GraphQL with Subscription (SubscriptionManager)
 
 ## ToFix
-- [x] fix run srcipt: cause error on exit
+- [x] fix run script: cause error on exit
 
 ## About author
 Hi, i'm a Front-end developper living in Geneva Switzerland and i build hybrid mobile & web applications for almost 15 years. You can follow me on Twitter @FazioNico or checkout my own website http://nicolasfazio.ch
