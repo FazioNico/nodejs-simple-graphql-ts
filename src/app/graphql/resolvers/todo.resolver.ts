@@ -3,7 +3,7 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 15-08-2017
+ * @Last modified time: 16-08-2017
 */
 
 import * as mongoose from 'mongoose'
@@ -18,7 +18,7 @@ class TodoController {
   }
 
   // this will find all the records in database and return it
-  index() {
+  index():Promise<ITodoModel[]>{
     return this.model.find()
     .sort('deadline')
     .exec()
@@ -28,10 +28,12 @@ class TodoController {
     .catch( error => {
       return error;
     });
+
+    //return a;
   }
 
   // this will find a single item based on id and return it.
-  single( options ) {
+  single( options ):Promise<ITodoModel> {
     return this.model.findOne({ _id: options.id })
     .exec()
     .then( item => {
@@ -43,7 +45,7 @@ class TodoController {
   }
 
   // this will insert a new item in database
-  create(data) {
+  create(data):Promise<ITodoModel> {
     const newitem = new this.model(data);
     console.log('###########')
     console.log('new todo-> ', data)
@@ -57,7 +59,7 @@ class TodoController {
   }
 
   // this will update existing record in database
-  update(data) {
+  update(data):Promise<ITodoModel> {
     return this.model.findOne({ _id: data.id })
     .exec()
     .then( (item) => {
@@ -80,12 +82,12 @@ class TodoController {
   }
 
   // this will remove the record from database.
-  delete( options ) {
-    this.model.findById( options.id )
+  delete( options ):Promise<{status:boolean}> {
+    return this.model.findById( options.id )
     .exec()
     .then( item => {
       item.remove();
-      return { status: true };
+      return { status: true, id:options.id };
     })
     .catch( error => {
       return error;

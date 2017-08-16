@@ -6,12 +6,11 @@
  * @Last modified time: 15-08-2017
  */
 
-import * as GraphQL from 'graphql';
-const {
+import {
  	GraphQLList,
  	GraphQLID,
  	GraphQLNonNull,
-} = GraphQL //GraphQL;
+} from 'graphql';
 
  // import the user type we created
  import { TodoType } from '../types/todo.type'
