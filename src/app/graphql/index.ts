@@ -8,10 +8,10 @@
 
 import { GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLSchema, GraphQLInterfaceTypeConfig } from 'graphql';
 // import all query files
-//import { UserQuery } from './queries/user.queries'
+import { UserQuery } from './queries/user.queries'
 import { TodoQuery } from './queries/todo.queries'
 // import all mutation files
-// import { UserMutation } from "./mutations/user.mutation";
+import { UserMutation } from "./mutations/user.mutation";
 import { TodoMutation } from "./mutations/todo.mutation";
 
 // define root query
@@ -19,8 +19,8 @@ const rootQueryConfig:GraphQLObjectTypeConfig<any,any> = {
   name: 'RootQueryType',
   description: 'This is the default root query provided by the backend',
   fields: {
-    // 	users: UserQuery.index(),
-    // 	user: UserQuery.single(),
+  	users: UserQuery.index(),
+  	user: UserQuery.single(),
     todos: TodoQuery.index(),
     todo: TodoQuery.single(),
   }
@@ -32,8 +32,8 @@ const rootMutationConfig:GraphQLObjectTypeConfig<any,any> = {
 	name: 'Mutation',
 	description: 'Default mutation provided by the backend APIs',
 	fields: {
-		// addUser: UserMutation.create(),
-		// updateUser: UserMutation.update(),
+		addUser: UserMutation.create(),
+		updateUser: UserMutation.update(),
 		// deleteUser: UserMutation.delete(),
     addTodo: TodoMutation.create(),
     updateTodo: TodoMutation.update(),

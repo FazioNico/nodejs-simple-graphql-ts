@@ -7,13 +7,13 @@
 */
 
 import * as mongoose from 'mongoose'
-import { Todo, ITodoModel } from "../../models/todo.models";
 
-export const TodoResolver = {
+import { User, IUserModel } from "../../models/user.models";
 
-  // this will find all the records in database and return it
-  index():Promise<ITodoModel[]>{
-    return Todo.find()
+export const UserResolver = {
+  // this will find all users in database and return it
+  index():Promise<IUserModel[]>{
+    return User.find()
     .sort('deadline')
     .exec()
     .then( records => {
@@ -26,9 +26,9 @@ export const TodoResolver = {
     //return a;
   },
 
-  // this will find a single item based on id and return it.
-  single( options ):Promise<ITodoModel> {
-    return Todo.findOne({ _id: options.id })
+  // this will find a single user based on id and return it.
+  single( options ):Promise<IUserModel> {
+    return User.findOne({ _id: options.id })
     .exec()
     .then( item => {
       return item;
@@ -38,11 +38,11 @@ export const TodoResolver = {
     });
   },
 
-  // this will insert a new item in database
-  create(data):Promise<ITodoModel> {
-    const newitem = new Todo(data);
+  // this will insert a new user in database
+  create(data):Promise<IUserModel> {
+    const newitem = new User(data);
     console.log('###########')
-    console.log('new todo-> ', data)
+    console.log('new User-> ', data)
     return newitem.save()
     .then( (result) => {
       return result;
@@ -53,8 +53,8 @@ export const TodoResolver = {
   },
 
   // this will update existing record in database
-  update(data):Promise<ITodoModel> {
-    return Todo.findOne({ _id: data.id })
+  update(data):Promise<IUserModel> {
+    return User.findOne({ _id: data.id })
     .exec()
     .then( (item) => {
       Object.keys(data).map( field => {
@@ -77,7 +77,7 @@ export const TodoResolver = {
 
   // this will remove the record from database.
   delete( options ):Promise<{status:boolean}> {
-    return Todo.findById( options.id )
+    return User.findById( options.id )
     .exec()
     .then( item => {
       item.remove();
