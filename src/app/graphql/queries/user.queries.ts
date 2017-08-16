@@ -41,7 +41,7 @@ export const UserQuery = {
  		}
  	},
  	/*
- 	exemple:
+ 	GraphQL exemple:
  	{
  		user(id: "$USER_ID") {
     id
@@ -50,6 +50,13 @@ export const UserQuery = {
     admin
  		}
  	}
+  Postman exemple:
+  {
+    "query": "query ($id: ID!) { user(id: $id) {id, email, created, admin} }",
+    "variables": {
+      "id": "5992b50893b4a617f1005f6f"
+    }
+  }
  	 */
  	single() {
  		return {
@@ -62,7 +69,11 @@ export const UserQuery = {
  				}
  			},
  			resolve(parent, args, context, info) {
- 				return UserResolver.single({ id: args.id });
+        // TODO: check in console to get user token ....
+        // console.log('-------------', info)
+        const userToken = context.headers['x-access-token']
+        // console.log('-------------', userToken)
+ 				return UserResolver.single(context, { id: args.id });
  			}
  		}
  	},

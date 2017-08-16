@@ -44,17 +44,16 @@ export class Server{
   }
 
   private config():void{
-    // define prot & normalize value
+    // define port & normalize value
     this.port = this.normalizePort(CONFIG.server.PORT);
     this.app
     .set( 'port', this.port )
     .disable('x-powered-by')
-    // TODO: add jwt auth token
-    // secret variable for jwt
-    //.set('superSecret', SECRET_TOKEN_KEY)
   }
   private middleware(){
     this.app
+    // secret variable for jwt
+    .set('superSecret', CONFIG.secretTokent)
     // use bodyParser middleware to decode json parameters
     .use( bodyParser.json({ limit: '50mb' }) )
     // use bodyParser middleware to decode urlencoded parameters
@@ -140,6 +139,7 @@ export class Server{
     this.server.on('error', this.onError);
     this.server.listen(this.port, ()=>{
       console.log("Listnening on port " + this.port)
+      // TODO: Real Time SubscriptionServer
       // new SubscriptionServer(
       //   {
       //     execute,

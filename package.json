@@ -37,6 +37,7 @@
     "express-graphql": "^0.6.7",
     "graphql": "^0.10.5",
     "graphql-subscriptions": "^0.4.4",
+    "jsonwebtoken": "^7.4.2",
     "mongoose": "^4.11.7"
   },
   "engines": {

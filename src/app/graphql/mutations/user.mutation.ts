@@ -107,10 +107,10 @@
 					description: 'Enter users password, will be automatically hashed',
 				},
 			},
-			resolve(parent, fields) {
-				return UserResolver.update(fields);
+			resolve(parent, fields, context) {
+        //console.log(context)
+				return UserResolver.update(context, fields);
 			}
-
 		}
 	},
 	delete() {
