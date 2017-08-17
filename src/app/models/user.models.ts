@@ -3,11 +3,11 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 16-08-2017
+ * @Last modified time: 17-08-2017
 */
 
 import * as mongoose from 'mongoose';
-import * as bcrypt from "bcrypt-nodejs";
+import * as bcrypt from "bcryptjs";
 
 const hash_password = ( password ) => {
 	let salt = bcrypt.genSaltSync(); // enter number of rounds, default: 10

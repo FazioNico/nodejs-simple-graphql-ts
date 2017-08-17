@@ -17,12 +17,12 @@ Testing build Typescript GraphQL server using data from MongoDB with Mongoose.
 
 ## Have todo
 - [x] create build.prod
-- [ ] create deploy script tasks
 - [x] add todo.mutation
 - [x] create user.model; user.queries; user.mutation; user.resolver; user.type
 - [x] add jwt user authentication
-- [ ] generate/send token to user client
+- [X] generate/send token to user client
 - [x] add user into GraphQL Routes
+- [ ] create deploy script tasks
 - [ ] add Real-Time GraphQL with Subscription (SubscriptionManager)
 
 ## ToFix

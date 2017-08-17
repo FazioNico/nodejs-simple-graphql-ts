@@ -3,13 +3,20 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 16-08-2017
+ * @Last modified time: 17-08-2017
 */
 
 import * as mongoose from 'mongoose'
 
 import { User, IUserModel } from "../../models/user.models";
 import { Authentication } from '../../authentication';
+import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcryptjs';
+import { CONFIG } from "../../config";
+
+const toObjectId = (_id: string): mongoose.Types.ObjectId =>{
+    return mongoose.Types.ObjectId.createFromHexString(_id);
+}
 
 export const UserResolver = {
   // this will find all users in database and return it
@@ -34,40 +41,87 @@ export const UserResolver = {
       .then(doc => {
         // check if user token ID is same of reqest options.id
         if(doc.user._id != options.id ){
-          return Promise.reject('user not have authorization to access.')
+          // return Promise.reject('user not have authorization to access.')
+          throw (new Error('user not have authorization to access.'))
         }
+        return doc;
+      })
+      .then(doc => {
         // if user is same... do stuff
         return User.findOne({ _id: options.id })
         .exec()
-        .then( item => {
-          return item;
-        })
-        .catch( error => {
-          return error;
-        });
       })
-
+      .then( user => {
+        console.log('XXXXX', user)
+        return user;
+      })
+      .catch( error => {
+        return error;
+      });
     }
     else {
-      return Promise.reject('user not auth')
+      //return Promise.reject({message:'user not auth'})
+      throw (new Error('user not auth'))
     }
   },
 
   // this will insert a new user in database
-  create(data):Promise<IUserModel> {
-    const newitem = new User(data);
-    // TODO:
-    // Encrypt pwd + return token for client localstorage
-    return newitem.save()
+  create(data:{email:string,password:string}):Promise<IUserModel|any> {
+    // check existe user in DB
+    // before add new user
+    // find the user
+    return User.findOne({email: data.email})
+    .exec()
+    .then((userFinded:IUserModel) => {
+      if (!userFinded) {
+        // Check password length is >= 6
+        if(data.password.length < CONFIG.passwordMinLenght) {
+          console.log('Error: password require min 6 chars.');
+          throw (new Error('password require min 6 characters'));
+        }
+        return true
+      }
+      else {
+        console.log('XXX',userFinded)
+        throw (new Error('User already existe'))
+      }
+    })
+    .then(_=> {
+      console.log('hasing...')
+      return bcrypt.hash(data.password, CONFIG.bcryptRound)
+    })
+    .then((hash:string)=> {
+      // create user
+      return new User({
+        email: data.email,
+        password: hash,
+        admin: false
+      });
+    })
+    .then((newUser:IUserModel) => {
+      console.log('saveing...')
+      return newUser.save()
+    })
     .then( (result) => {
       return result;
     })
-    .catch( (error) => {
-      return error;
-    });
+    .catch(err=> {
+      console.log('catch final')
+      return err
+    })
   },
 
   // this will update existing record in database
+  /*
+  Exemple with Postman:
+  {
+      "query": "mutation ($id:ID!,$admin:Boolean) { updateUser(id:$id,admin: $admin) {id, email, admin} }",
+      "variables": {
+          "id": "59952cb5bd134935a0df5663",
+  		    "admin": true
+      }
+  }
+   */
   update(context, data):Promise<IUserModel> {
     const isAuth = Authentication.checkAuthentication(context)
     if(isAuth) {
@@ -75,31 +129,46 @@ export const UserResolver = {
       .then(doc => {
         // check if user token ID is same of reqest data.id
         if(doc.user._id != data.id ){
-          return Promise.reject('user not have authorization to update user.')
+          // return Promise.reject({message:'user not have authorization to update user.'})
+          throw (new Error('you not have authorization to update this user.'))
         }
-        return User.findOne({ _id: data.id })
-        .exec()
-        .then( (item) => {
-          Object.keys(data).map( field => {
-            item[field] = data[field];
-          });
-
-          return item.save()
-          .then( updated => {
-            return updated;
-          })
-          .catch( (error) => {
-            return error;
-          });
-
-        })
-        .catch( (error) => {
-          return error;
-        });
+        return
       })
+      .then(_=> {
+        return User.findOne({ _id: data.id })
+        //.exec()
+      })
+      .then( (user) => {
+          Object.keys(data).map( field => {
+            user[field] = data[field];
+          });
+          return user.save().then(result => {console.log('result->',data);return result})
+      })
+      .then( updated => {
+
+        return updated;
+      })
+      .catch( (error) => {
+        return error;
+      });
     }
     else {
-      return Promise.reject('user not auth')
+      //return Promise.reject({message:'user not auth'})
+      //throw (new Error('user not auth'))
+      return User.findOne({ _id: data.id })
+      .exec()
+      .then( (user) => {
+        Object.keys(data).map( field => {
+          user[field] = data[field];
+        });
+        return user.save()
+      })
+      .then( updated => {
+      return updated;
+      })
+      .catch( (error) => {
+      return error;
+      });
     }
   },
 
@@ -114,6 +183,65 @@ export const UserResolver = {
     .catch( error => {
       return error;
     });
-  }
+  },
 
+  auth(options):Promise<IUserModel> {
+    return User.findOne({email: options.email})
+    .exec()
+    .then( userFinded => {
+      if (!userFinded) {
+        //return Promise.reject('Authentication failed. User not found.')
+        throw (new Error('Authentication failed. User not found.' ));
+      }
+      // use bcrypt to .compare() userFinded.password with options.password
+      //return bcrypt.compare(options.password, userFinded.password)
+      return bcrypt.compare(options.password, userFinded.password)
+      .then(result=> {
+        //console.log('user auth', result)
+        if (result === false) {
+            throw (new Error('Authentication failed. Wrong password.'))
+        }
+        if (result === true){
+          // if result true => create token with jwt.sign()
+          // return response object with token & user
+          var token = jwt.sign(userFinded, CONFIG.secretTokent, {
+            expiresIn: CONFIG.jwtExpire // expires in 24 hours
+          });
+
+          // return the information including token as JSON
+          return {
+            user: userFinded,
+            token: token
+          };
+        }
+        else {
+          throw (new Error(`Authentication failed. Error with compare password->  ${result}`));
+        }
+      })
+    })
+    .catch( error => {
+      console.log('catch final')
+      return error;
+    });
+
+  },
+
+  isAuth(context):Promise<any>{
+
+      return new Promise((resolve, reject)=> {
+        let isAuth = Authentication.checkAuthentication(context);
+        (isAuth)?resolve(isAuth):reject(isAuth)
+      })
+      .then( (isAuth:any)=> {
+        return User.findById(toObjectId(isAuth.user._id))
+                   .exec()
+      })
+      .then(user => {
+        return user
+      })
+      .catch(err => {
+        return err;
+      })
+
+  }
 };

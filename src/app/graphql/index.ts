@@ -3,7 +3,7 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 16-08-2017
+ * @Last modified time: 17-08-2017
 */
 
 import { GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLSchema, GraphQLInterfaceTypeConfig } from 'graphql';
@@ -20,7 +20,9 @@ const rootQueryConfig:GraphQLObjectTypeConfig<any,any> = {
   description: 'This is the default root query provided by the backend',
   fields: {
   	users: UserQuery.index(),
-  	user: UserQuery.single(),
+    user: UserQuery.single(),
+    auth: UserQuery.auth(),
+  	isAuth: UserQuery.isAuth(),
     todos: TodoQuery.index(),
     todo: TodoQuery.single(),
   }

@@ -3,7 +3,7 @@
  * @Date:   15-08-2017
  * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 16-08-2017
+ * @Last modified time: 17-08-2017
  */
 
  import {
@@ -70,6 +70,7 @@
  	},
   update() {
     /*
+    Exemple with GraphQL
     mutation {
       updateUser (
         id:"$user_id"
@@ -79,6 +80,14 @@
         email
         admin
       }
+    }
+    Exemple with Postman:
+    {
+        "query": "mutation ($id: ID!) { updateUser(id:$id) {id, email} }",
+        "variables": {
+            "id": "59952cb5bd134935a0df5663",
+        	"admin": true
+        }
     }
      */
 		return {

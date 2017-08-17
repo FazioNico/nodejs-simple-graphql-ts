@@ -3,17 +3,18 @@
  * @Date:   15-08-2017
  * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 16-08-2017
+ * @Last modified time: 17-08-2017
  */
 
 import {
  	GraphQLList,
  	GraphQLID,
  	GraphQLNonNull,
+  GraphQLString
 } from 'graphql';
 
  // import the user type we created
- import { UserType } from '../types/user.type'
+ import { UserType, AuthType } from '../types/user.type'
  // import the user resolver we created
  import { UserResolver } from "../resolvers/user.resolver"
 
@@ -77,5 +78,36 @@ export const UserQuery = {
  			}
  		}
  	},
+
+  auth(){
+    return {
+      type: AuthType,
+ 			description: 'This will return data of a single todo based on the id provided',
+ 			args: {
+        email: {
+    			type: new GraphQLNonNull(GraphQLString),
+    			description: 'Email address of the user, must be valid and unique',
+    		},
+        password: {
+    			type: new GraphQLNonNull(GraphQLString),
+    			description: 'password of the user, must be valid',
+    		},
+ 			},
+ 			resolve(parent, args, context, info) {
+ 				return UserResolver.auth({ email: args.email, password:args.password });
+ 			}
+    }
+  },
+
+  isAuth(){
+    return {
+      type: UserType,
+      args: {},
+      resolve(parent, args, context, info) {
+        console.log('isAuth')
+ 				return UserResolver.isAuth(context);
+ 			}
+    }
+  }
 
  };
