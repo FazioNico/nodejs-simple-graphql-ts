@@ -22,7 +22,6 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 // import config file
 import{ CONFIG } from "./config";
 // import schema file
-//import * as GraphQLSchema from "./graphql";
 import { schemas } from "./graphql";
 // import DB connect
 import { DataBase }  from "./databases/mongoose";

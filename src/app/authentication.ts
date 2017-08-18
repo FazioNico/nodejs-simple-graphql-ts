@@ -3,7 +3,7 @@
  * @Date:   16-08-2017
  * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 16-08-2017
+ * @Last modified time: 19-08-2017
  */
 
  import { verify } from 'jsonwebtoken';
@@ -37,19 +37,7 @@
        .catch(err => {
          return false
        })
-       //let payload = Promise.resolve(verify(token, CONFIG.secretTokent));
-      //  payload.then(result=>{
-      //    console.log('XX',result._doc)
-      //  })
-      //  verify(token, CONFIG.secretTokent,  (err: Error, decoded: any): boolean|any => {
-      //    if (err) {
-      //      return(false);
-      //    } else {
-      //      console.log('req.decoded-> ', decoded._doc )
-      //      req.decoded = decoded;
-      //      return({success:true, user: decoded._doc});
-      //    }
-      //  });
+       
      }
    }
 
