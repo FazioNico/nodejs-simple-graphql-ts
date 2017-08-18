@@ -3,7 +3,7 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 16-08-2017
+ * @Last modified time: 19-08-2017
 */
 
 import * as mongoose from 'mongoose'
@@ -22,13 +22,11 @@ export const TodoResolver = {
     .catch( error => {
       return error;
     });
-
-    //return a;
   },
 
   // this will find a single item based on id and return it.
   single( options ):Promise<ITodoModel> {
-    return Todo.findOne({ _id: options.id })
+    return Todo.findOne({ _id: (options.id||options._id) })
     .exec()
     .then( item => {
       return item;
@@ -54,7 +52,7 @@ export const TodoResolver = {
 
   // this will update existing record in database
   update(data):Promise<ITodoModel> {
-    return Todo.findOne({ _id: data.id })
+    return Todo.findOne({ _id: (data.id || data._id) })
     .exec()
     .then( (item) => {
       Object.keys(data).map( field => {
@@ -77,11 +75,11 @@ export const TodoResolver = {
 
   // this will remove the record from database.
   delete( options ):Promise<{status:boolean}> {
-    return Todo.findById( options.id )
+    return Todo.findById( (options._id  || options.id))
     .exec()
     .then( item => {
       item.remove();
-      return { status: true, id:options.id };
+      return { status: true, _id: (options._id  || options.id)};
     })
     .catch( error => {
       return error;

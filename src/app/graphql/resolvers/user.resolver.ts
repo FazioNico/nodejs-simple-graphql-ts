@@ -3,7 +3,7 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 17-08-2017
+ * @Last modified time: 18-08-2017
 */
 
 import * as mongoose from 'mongoose'
@@ -40,7 +40,7 @@ export const UserResolver = {
       return isAuth
       .then(doc => {
         // check if user token ID is same of reqest options.id
-        if(doc.user._id != options.id ){
+        if(doc.user._id != options.id || options._id){
           // return Promise.reject('user not have authorization to access.')
           throw (new Error('user not have authorization to access.'))
         }
@@ -48,7 +48,7 @@ export const UserResolver = {
       })
       .then(doc => {
         // if user is same... do stuff
-        return User.findOne({ _id: options.id })
+        return User.findOne({ _id: options.id || options._id})
         .exec()
       })
       .then( user => {
@@ -128,14 +128,16 @@ export const UserResolver = {
       return isAuth
       .then(doc => {
         // check if user token ID is same of reqest data.id
-        if(doc.user._id != data.id ){
+
+        if(doc.user._id != (data.id || data._id)){
+          console.log(doc.user._id, data.id || data._id)
           // return Promise.reject({message:'user not have authorization to update user.'})
           throw (new Error('you not have authorization to update this user.'))
         }
         return
       })
       .then(_=> {
-        return User.findOne({ _id: data.id })
+        return User.findOne({ _id: (data.id || data._id)})
         //.exec()
       })
       .then( (user) => {
@@ -155,7 +157,7 @@ export const UserResolver = {
     else {
       //return Promise.reject({message:'user not auth'})
       //throw (new Error('user not auth'))
-      return User.findOne({ _id: data.id })
+      return User.findOne({ _id: (data.id || data._id)})
       .exec()
       .then( (user) => {
         Object.keys(data).map( field => {
@@ -174,11 +176,11 @@ export const UserResolver = {
 
   // this will remove the record from database.
   delete( options ):Promise<{status:boolean,id:string}> {
-    return User.findById( options.id )
+    return User.findById( (options.id || options._id))
     .exec()
     .then( item => {
       item.remove();
-      return { status: true, id:options.id };
+      return { status: true, id:(options.id || options._id) };
     })
     .catch( error => {
       return error;
