@@ -3,13 +3,14 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 16-08-2017
+ * @Last modified time: 19-08-2017
 */
 
 import * as express from 'express';
 import * as http  from "http";
 import * as bodyParser from 'body-parser';
 import * as expressGraphQL from 'express-graphql';
+import {graphqlExpress, graphiqlExpress} from 'graphql-server-express'
 import * as cors from 'cors';
 import * as morgan from 'morgan';
 
@@ -21,10 +22,11 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 // import config file
 import{ CONFIG } from "./config";
 // import schema file
-import * as GraphQLSchema from "./graphql";
+import { schemas } from "./graphql";
 // import DB connect
 import { DataBase }  from "./databases/mongoose";
 
+const PACKAGE = require("../../package.json");
 
 export class Server{
 
@@ -74,19 +76,24 @@ export class Server{
       this.app.get( '/', (req, res) => {
         res.json({
           code: 200,
-          message: 'Hello World'
+          message: `${PACKAGE.name} - v.${PACKAGE.version} / ${PACKAGE.description} by ${PACKAGE.author}`
         });
       });
-      // GraphQL API Endpoints
-      this.app.use(
-        '/graphql',
-        expressGraphQL( () => {
-          return {
-            graphiql: true,
-            schema: GraphQLSchema,
-          }
-        })
-      );
+      //GraphQL API Endpoints
+      this.app
+        .use(
+          '/graphql',
+          expressGraphQL( () => {
+            return {
+              graphiql: true,
+              schema: schemas //GraphQLSchema,
+            }
+          })
+        )
+        //.use('/graphql', graphqlExpress({schema:schemas}))
+        .use('/graphiql', graphiqlExpress({
+          endpointURL: '/graphql'
+        }))
     })
     .catch(error => {
       // DB connection Error => load only server route
