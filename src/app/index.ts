@@ -81,19 +81,33 @@ export class Server{
       });
       //GraphQL API Endpoints
       this.app
-        .use(
-          '/graphql',
-          expressGraphQL( () => {
-            return {
-              graphiql: true,
-              schema: schemas //GraphQLSchema,
-            }
-          })
-        )
-        //.use('/graphql', graphqlExpress({schema:schemas}))
+        // .use(
+        //   '/graphql',
+        //   expressGraphQL( () => {
+        //     return {
+        //       graphiql: true,
+        //       schema: schemas //GraphQLSchema,
+        //     }
+        //   })
+        // )
+        .use('/graphql', graphqlExpress(req=> ({
+          schema:schemas,
+          context: req
+        })))
         .use('/graphiql', graphiqlExpress({
-          endpointURL: '/graphql'
-        }))
+          endpointURL: '/graphql',
+          subscriptionsEndpoint: `ws://localhost:8080/subscriptions`,
+        }));
+        // Real Time SubscriptionServer
+        const subscriptionServer = new SubscriptionServer(
+          {
+            schema: schemas,
+            execute,
+            subscribe,
+          }, {
+            server: this.server,
+            path: '/subscriptions',
+          });
     })
     .catch(error => {
       // DB connection Error => load only server route
@@ -146,16 +160,7 @@ export class Server{
     this.server.on('error', this.onError);
     this.server.listen(this.port, ()=>{
       console.log("Listnening on port " + this.port)
-      // TODO: Real Time SubscriptionServer
-      // new SubscriptionServer(
-      //   {
-      //     execute,
-      //     subscribe,
-      //     schema: GraphQLSchema.schemas,
-      //   }, {
-      //     server: this.server,
-      //     path: '/subscriptions',
-      // });
+
     });
   }
 

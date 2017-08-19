@@ -1,6 +1,6 @@
 {
   "name": "nodejs-simple-graphql-ts",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "NodeJS Simple GraphQL server with Typescript",
   "main": "server.js",
   "scripts": {

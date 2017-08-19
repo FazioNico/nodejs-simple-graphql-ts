@@ -11,6 +11,7 @@ import * as userType from "./user.type";
 import * as commonType from "./common.type";
 import * as queryType from "./queries";
 import * as mutationsType from "./mutations";
+import * as subscribType from "./subscrib";
 
 const typesModules = [
   todoType,
@@ -18,12 +19,14 @@ const typesModules = [
   commonType,
   queryType,
   mutationsType,
+  subscribType,
 ];
 
 const mainDefs = [`
     schema {
         query: Query,
         mutation: Mutation
+        subscription: Subscription
     }
 `,
 ];

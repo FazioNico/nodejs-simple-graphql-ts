@@ -6,6 +6,9 @@
  * @Last modified time: 19-08-2017
 */
 
+import { PubSub } from 'graphql-subscriptions';
+export const pubsub = new PubSub();
+
 import { TodoResolver } from "./todo.resolver";
 import { UserResolver } from "./user.resolver";
 
@@ -44,7 +47,11 @@ export const resolvers = {
   Mutation: {
     // Todo
     addTodo:  (root, args, context, info) => {
-      return TodoResolver.create(args);
+      return  TodoResolver.create(args)
+              .then(todo=>{
+                 pubsub.publish('todoAdded', { ['todoAdded']: todo });
+                 return todo
+              })
     },
     updateTodo:  (root, args, context, info) => {
       return TodoResolver.update(args);
@@ -65,4 +72,18 @@ export const resolvers = {
     },
   },
 
+  Subscription: {
+  /**
+  GraphQL Exemple:
+    subscription {
+      todoAdded {
+        _id
+      }
+    }
+   */
+    todoAdded: {
+      // the subscription payload is the Todo.
+      subscribe: () => pubsub.asyncIterator('todoAdded'),
+    },
+  },
 }
