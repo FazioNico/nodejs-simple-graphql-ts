@@ -3,7 +3,7 @@
 * @Date:   17-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 18-08-2017
+ * @Last modified time: 19-08-2017
 */
 
 import { TodoResolver } from "./todo.resolver";
@@ -61,7 +61,7 @@ export const resolvers = {
       return UserResolver.update(context, args);
     },
     deleteUser: (root, args, context, info) => {
-      return UserResolver.delete(args);
+      return UserResolver.delete(context, args);
     },
   },
 

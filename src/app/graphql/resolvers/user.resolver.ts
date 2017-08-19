@@ -3,7 +3,7 @@
 * @Date:   15-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 18-08-2017
+ * @Last modified time: 19-08-2017
 */
 
 import * as mongoose from 'mongoose'
@@ -35,34 +35,30 @@ export const UserResolver = {
 
   // this will find a single user based on id and return it.
   single( context, options ):Promise<IUserModel>  {
-    const isAuth = Authentication.checkAuthentication(context)
-    if(isAuth) {
-      return isAuth
-      .then(doc => {
-        // check if user token ID is same of reqest options.id
-        if(doc.user._id != options.id || options._id){
-          // return Promise.reject('user not have authorization to access.')
-          throw (new Error('user not have authorization to access.'))
-        }
-        return doc;
-      })
-      .then(doc => {
-        // if user is same... do stuff
-        return User.findOne({ _id: options.id || options._id})
-        .exec()
-      })
-      .then( user => {
-        console.log('XXXXX', user)
-        return user;
-      })
-      .catch( error => {
-        return error;
-      });
-    }
-    else {
-      //return Promise.reject({message:'user not auth'})
-      throw (new Error('user not auth'))
-    }
+    return Authentication.checkAuthentication(context)
+    .then(doc => {
+      // check if user token ID is same of reqest options.id
+      if(doc._id != options.id || options._id){
+        // return Promise.reject('user not have authorization to access.')
+        throw (new Error('user not have authorization to access.'))
+      }
+      return doc;
+    })
+    .then(doc => {
+      // if user is same... do stuff
+      return User.findOne({ _id: options.id || options._id})
+      .exec()
+    })
+    .then( user => {
+      console.log('XXXXX', user)
+      return user;
+    })
+    .catch( error => {
+      return error;
+    });
+
+
+
   },
 
   // this will insert a new user in database
@@ -123,61 +119,53 @@ export const UserResolver = {
   }
    */
   update(context, data):Promise<IUserModel> {
-    const isAuth = Authentication.checkAuthentication(context)
-    if(isAuth) {
-      return isAuth
-      .then(doc => {
-        // check if user token ID is same of reqest data.id
+    return Authentication.checkAuthentication(context)
+    .then(doc => {
+      // check if user token ID is same of reqest data.id
 
-        if(doc.user._id != (data.id || data._id)){
-          console.log(doc.user._id, data.id || data._id)
-          // return Promise.reject({message:'user not have authorization to update user.'})
-          throw (new Error('you not have authorization to update this user.'))
-        }
-        return
-      })
-      .then(_=> {
-        return User.findOne({ _id: (data.id || data._id)})
-        //.exec()
-      })
-      .then( (user) => {
-          Object.keys(data).map( field => {
-            user[field] = data[field];
-          });
-          return user.save().then(result => {console.log('result->',data);return result})
-      })
-      .then( updated => {
-
-        return updated;
-      })
-      .catch( (error) => {
-        return error;
-      });
-    }
-    else {
-      //return Promise.reject({message:'user not auth'})
-      //throw (new Error('user not auth'))
+      if(doc._id != (data.id || data._id)){
+        console.log(doc._id, data.id || data._id)
+        // return Promise.reject({message:'user not have authorization to update user.'})
+        throw (new Error('you not have authorization to update this user.'))
+      }
+      return
+    })
+    .then(_=> {
       return User.findOne({ _id: (data.id || data._id)})
-      .exec()
-      .then( (user) => {
+      //.exec()
+    })
+    .then( (user) => {
         Object.keys(data).map( field => {
           user[field] = data[field];
         });
-        return user.save()
-      })
-      .then( updated => {
+        return user.save().then(result => {console.log('result->',data);return result})
+    })
+    .then( updated => {
+
       return updated;
-      })
-      .catch( (error) => {
+    })
+    .catch( (error) => {
       return error;
-      });
-    }
+    });
   },
 
   // this will remove the record from database.
-  delete( options ):Promise<{status:boolean,id:string}> {
-    return User.findById( (options.id || options._id))
-    .exec()
+  delete( context, options ):Promise<{status:boolean,id:string}> {
+    return Authentication.checkAuthentication(context)
+    .then(doc => {
+      // check if user token ID is same of reqest data.id
+
+      if(doc._id != (options.id || options._id)){
+        console.log(doc._id, options.id || options._id)
+        // return Promise.reject({message:'user not have authorization to update user.'})
+        throw (new Error('you not have authorization to update this user.'))
+      }
+      return
+    })
+    .then(_=> {
+      return User.findById( (options.id || options._id))
+      .exec()
+    })
     .then( item => {
       item.remove();
       return { status: true, id:(options.id || options._id) };
@@ -229,11 +217,7 @@ export const UserResolver = {
   },
 
   isAuth(context):Promise<any>{
-
-      return new Promise((resolve, reject)=> {
-        let isAuth = Authentication.checkAuthentication(context);
-        (isAuth)?resolve(isAuth):reject(isAuth)
-      })
+      return Authentication.checkAuthentication(context)
       .then( (isAuth:any)=> {
         return User.findById(toObjectId(isAuth.user._id))
                    .exec()
@@ -244,6 +228,5 @@ export const UserResolver = {
       .catch(err => {
         return err;
       })
-
   }
 };
