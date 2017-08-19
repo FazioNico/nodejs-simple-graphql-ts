@@ -3,59 +3,33 @@
 * @Date:   17-08-2017
 * @Email:  contact@nicolasfazio.ch
  * @Last modified by:   webmaster-fazio
- * @Last modified time: 18-08-2017
+ * @Last modified time: 19-08-2017
 */
 
-export const typeDefs = [`
+import * as todoType from "./todo.type";
+import * as userType from "./user.type";
+import * as commonType from "./common.type";
+import * as queryType from "./queries";
+import * as mutationsType from "./mutations";
 
-  type Todo {
-    _id: String
-    description: String
-    isComplete: Boolean
-    deadline: String
-    expire: Boolean
-  }
+const typesModules = [
+  todoType,
+  userType,
+  commonType,
+  queryType,
+  mutationsType,
+];
 
-  type User {
-    _id: String
-    email: String
-    admin: Boolean
-    created: String
-  }
+const mainDefs = [`
+    schema {
+        query: Query,
+        mutation: Mutation
+    }
+`,
+];
 
-  type Auth {
-    user: User
-    token: String
-  }
-
-  type Status {
-    status:Boolean,
-    _id:String
-  }
-
-  type Query {
-    todo(_id: String): Todo
-    todos: [Todo]
-
-    user(_id: String): User
-    users: [User]
-
-    auth(email: String!, password: String!): Auth
-    isAuth: User
-  }
-
-  type Mutation {
-    addTodo(description: String, deadline: String): Todo
-    updateTodo(_id: String!, description: String, isComplete: Boolean, deadline: String, expire: Boolean): Todo
-    deleteTodo(_id: String!): Status
-
-    addUser(email: String!, password: String!): User
-    updateUser(_id: String!, admin: Boolean): User
-    deleteUser(_id: String!): Status
-  }
-
-  schema {
-    query: Query
-    mutation: Mutation
-  }
-  `]
+export const typeDefs = [
+  ...mainDefs,
+  ...typesModules.map((m) => m.typeDef)
+                 .filter((res) => !!res)
+];
